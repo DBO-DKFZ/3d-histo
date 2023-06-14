@@ -1,0 +1,10 @@
+name: 3d-histo
+channels:
+  - defaults
+dependencies:
+  - pip
+  - python=3.10.*
+  - pip:
+    - opencv-python==4.7.0.72
+    - matplotlib==3.7.1
+    - tqdm==4.65.0
