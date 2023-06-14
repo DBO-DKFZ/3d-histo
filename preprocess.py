@@ -118,7 +118,7 @@ def main(fol_p: Path, out_p: Path):
 
     idx = 1
     for img_p in tqdm(paths):
-        f_name = "image_%03d" % idx + ".jpg"
+        f_name = "image_%03d" % idx + ".png"
         img_out = extract_tissue(img_p, H_max, W_max)
         out_f = out_p / f_name
         plt.imsave(str(out_f), img_out)
@@ -126,7 +126,7 @@ def main(fol_p: Path, out_p: Path):
 
 
 if __name__ == "__main__":
-    fol_p = Path("/mnt/ssd/Data/3DTumorModell/Slides/slices_png_2")
-    out_p = Path("/mnt/ssd/Data/3DTumorModell/Slides/test")
+    fol_p = Path("/mnt/ssd/Data/3DTumorModell/qupath_output/slices_png_2")
+    out_p = Path("/mnt/ssd/Data/3DTumorModell/fiji_input/half2_png")
     out_p.mkdir(parents=True, exist_ok=True)
     main(fol_p, out_p)
