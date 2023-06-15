@@ -8,3 +8,4 @@ dependencies:
     - opencv-python==4.7.0.72
     - matplotlib==3.7.1
     - tqdm==4.65.0
+    - nibabel==5.1.0

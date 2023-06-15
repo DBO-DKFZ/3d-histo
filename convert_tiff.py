@@ -28,7 +28,8 @@ def convert(tiff_p: Path, out_p: Path):
 
         f_name = "image_%03d" % idx + ".png"
         out_f = out_p / f_name
-        plt.imsave(str(out_f), img_out)
+        # plt.imsave(str(out_f), img_out)
+        Image.fromarray(img_out).save(str(out_f))  # Use Pillow to write image instead of matplotlib
         idx += 1
 
 
