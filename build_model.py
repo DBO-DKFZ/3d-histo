@@ -25,20 +25,25 @@ def build_nifti(stack: np.ndarray, out_p: Path):
     nib.save(ni_img, str(out_p / "3d_model.nii"))
 
 
-def build_ply(stack: np.ndarray, out_p: Path):
+def build_ply(xyz: np.ndarray, colors: np.ndarray, out_p: Path):
+    # Tutorial from http://www.open3d.org/docs/latest/tutorial/Basic/working_with_numpy.html#From-NumPy-to-open3d.PointCloud
     # Generate some neat n times 3 matrix using a variant of sync function
-    x = np.linspace(-3, 3, 401)
-    mesh_x, mesh_y = np.meshgrid(x, x)
-    z = np.sinc((np.power(mesh_x, 2) + np.power(mesh_y, 2)))
-    z_norm = (z - z.min()) / (z.max() - z.min())
-    xyz = np.zeros((np.size(mesh_x), 3))
-    xyz[:, 0] = np.reshape(mesh_x, -1)
-    xyz[:, 1] = np.reshape(mesh_y, -1)
-    xyz[:, 2] = np.reshape(z_norm, -1)
+    # x = np.linspace(-3, 3, 401)
+    # mesh_x, mesh_y = np.meshgrid(x, x)
+    # z = np.sinc((np.power(mesh_x, 2) + np.power(mesh_y, 2)))
+    # z_norm = (z - z.min()) / (z.max() - z.min())
+    # xyz = np.zeros((np.size(mesh_x), 3))
+    # xyz[:, 0] = np.reshape(mesh_x, -1)
+    # xyz[:, 1] = np.reshape(mesh_y, -1)
+    # xyz[:, 2] = np.reshape(z_norm, -1)
 
     pcd = o3d.geometry.PointCloud()
+    print("Adding points to Pointcloud object")
     pcd.points = o3d.utility.Vector3dVector(xyz)
-    o3d.io.write_point_cloud(str(out_p / "sync.ply"), pcd)
+    print("Adding colors to Pointcloud object")
+    pcd.colors = o3d.utility.Vector3dVector(colors / 255.0)  # Colors are expected to be floats in  range [0, 1]
+    print("Writing .ply file")
+    o3d.io.write_point_cloud(str(out_p / "3d_model.ply"), pcd)
 
 
 def main(img_p: Path, out_p: Path):
@@ -46,13 +51,25 @@ def main(img_p: Path, out_p: Path):
     pil_img = Image.open(files[0])
     img = np.array(pil_img)
     stack = np.zeros((len(files), *img.shape), dtype=np.uint8)  # Allocate stack array
+    z_val = 0
+    all_xyz = []
+    all_colors = []
     for i in tqdm(range(len(files))):
         pil_img = Image.open(files[i])
         img = np.array(pil_img)
+        indices = np.where(np.all(img != [0, 0, 0], axis=-1))
+        xy = np.array(indices).T  # Use numpy coordinare system with x for rows and y for columns
+        xyz = np.hstack((xy, np.ones((len(xy), 1), dtype=np.uint8) * z_val))
+        colors = img[indices]
+        all_xyz.append(xyz)
+        all_colors.append(colors)
+        z_val += 3
         stack[i] = img
 
     # build_nifti(stack, out_p)
-    build_ply(stack, out_p)
+    all_xyz = np.vstack(all_xyz)
+    all_colors = np.vstack(all_colors)
+    build_ply(all_xyz, all_colors, out_p)
 
 
 if __name__ == "__main__":
