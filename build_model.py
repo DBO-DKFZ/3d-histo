@@ -5,6 +5,7 @@ from tqdm import tqdm
 from PIL import Image
 import numpy as np
 import matplotlib.pyplot as plt
+import cv2
 
 import nibabel as nib
 import open3d as o3d
@@ -19,10 +20,13 @@ def build_nifti(stack: np.ndarray, out_p: Path):
 
     # TODO: Add correct spacing of 1µm in x/y direction and 3µm in z direction
 
-    ni_img = nib.Nifti1Image(stack, np.eye(4))
+    transform = np.array(
+        ((1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (0, 0, 0, 1)),
+    )
+    ni_img = nib.Nifti1Image(stack, affine=transform)
     print(ni_img.header)
     # ni_img.header["pixdim"] = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]  # Does not help
-    nib.save(ni_img, str(out_p / "3d_model.nii"))
+    nib.save(ni_img, str(out_p / "3d_model_v2.nii"))
 
 
 def build_ply(xyz: np.ndarray, colors: np.ndarray, out_p: Path):
@@ -50,26 +54,35 @@ def main(img_p: Path, out_p: Path):
     files = sorted(list(img_p.iterdir()))
     pil_img = Image.open(files[0])
     img = np.array(pil_img)
-    stack = np.zeros((len(files), *img.shape), dtype=np.uint8)  # Allocate stack array
+    scale_percent = 10  # percent of original size
+    width = int(img.shape[1] * scale_percent / 100)
+    height = int(img.shape[0] * scale_percent / 100)
+    dim = (width, height)
+    stack = np.zeros((len(files) * 3, height, width, 3), dtype=np.uint8)  # Allocate stack array
     z_val = 0
     all_xyz = []
     all_colors = []
     for i in tqdm(range(len(files))):
         pil_img = Image.open(files[i])
         img = np.array(pil_img)
-        indices = np.where(np.all(img != [0, 0, 0], axis=-1))
-        xy = np.array(indices).T  # Use numpy coordinare system with x for rows and y for columns
-        xyz = np.hstack((xy, np.ones((len(xy), 1), dtype=np.uint8) * z_val))
-        colors = img[indices]
-        all_xyz.append(xyz)
-        all_colors.append(colors)
+        resized = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
+        # indices = np.where(np.all(img != [0, 0, 0], axis=-1))
+        # xy = np.array(indices).T  # Use numpy coordinare system with x for rows and y for columns
+        # xyz = np.hstack((xy, np.ones((len(xy), 1), dtype=np.uint8) * z_val))
+        # colors = img[indices]
+        # all_xyz.append(xyz)
+        # all_colors.append(colors)
+        stack[z_val] = resized
         z_val += 3
-        stack[i] = img
 
-    # build_nifti(stack, out_p)
-    all_xyz = np.vstack(all_xyz)
-    all_colors = np.vstack(all_colors)
-    build_ply(all_xyz, all_colors, out_p)
+    stack = stack.transpose(2, 0, 1, 3)  # Transpose coordinate system to (width, depth, height, channels)
+    stack = np.flip(stack, axis=2)  # Flip height Axis
+    stack = np.flip(stack, axis=0)  # Flip width Axis
+    stack = np.flip(stack, axis=1)  # Flip depth Axis
+    build_nifti(stack, out_p)
+    # all_xyz = np.vstack(all_xyz)
+    # all_colors = np.vstack(all_colors)
+    # build_ply(all_xyz, all_colors, out_p)
 
 
 if __name__ == "__main__":
