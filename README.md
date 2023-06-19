@@ -7,6 +7,6 @@
 3.) Import image sequence to Fiji and run TrakEM2 plugin for spatial alignment. \
 Tutorial: https://www.youtube.com/watch?v=kUyXQRcKWOk&t=2s
 
-4.) Export aligned image sequence to .png from TrakEM2
+4.) Export aligned image sequence from TrakEM2 to .tif and convert to .png using `convert_tiff.py` script.
 
-5.) Build NIfTI 3D image from aligned .png images
+5.) Build 3D model from aligned .png images using `build_model.py`.
