@@ -38,12 +38,14 @@ if __name__ == "__main__":
 
     parser = ArgumentParser()
     parser.add_argument(
+        "-i",
         "--in_p",
         type=str,
         help="Path to exported .tif files from Fiji",
         default="/mnt/ssd/Data/3DTumorModell/fiji_output/trakem_tiff",
     )
     parser.add_argument(
+        "-o",
         "--out_p",
         type=str,
         help="Path where to store coverted .png files",

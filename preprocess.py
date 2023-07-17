@@ -131,12 +131,14 @@ if __name__ == "__main__":
 
     parser = ArgumentParser()
     parser.add_argument(
+        "-i",
         "--in_p",
         type=str,
         help="Path to exported .png files from Qupath",
         default="/mnt/ssd/Data/3DTumorModell/qupath_output/cropped_slices",
     )
     parser.add_argument(
+        "-o",
         "--out_p",
         type=str,
         help="Path where to store processed images for further spatial alignment",

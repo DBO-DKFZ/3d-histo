@@ -99,12 +99,14 @@ if __name__ == "__main__":
 
     parser = ArgumentParser()
     parser.add_argument(
+        "-i",
         "--in_p",
         type=str,
         help="Path to image sequence",
         default="/mnt/ssd/Data/3DTumorModell/fiji_output/convert_png",
     )
     parser.add_argument(
+        "-o",
         "--out_p",
         type=str,
         help="Path where to store 3D model file",
