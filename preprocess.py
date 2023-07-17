@@ -148,5 +148,6 @@ if __name__ == "__main__":
 
     fol_p = Path(args.in_p)
     out_p = Path(args.out_p)
-    out_p.mkdir(parents=True, exist_ok=True)
+    assert fol_p.exists(), "Provided input path does not exist"
+    assert out_p.exists(), "Provided output path does not exist"
     main(fol_p, out_p)

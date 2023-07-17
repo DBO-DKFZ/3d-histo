@@ -55,5 +55,6 @@ if __name__ == "__main__":
 
     tiff_p = Path(args.in_p)
     out_p = Path(args.out_p)
-    out_p.mkdir(parents=True, exist_ok=True)
+    assert tiff_p.exists(), "Provided input path does not exist"
+    assert out_p.exists(), "Provided output path does not exist"
     convert(tiff_p, out_p)

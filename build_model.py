@@ -128,5 +128,6 @@ if __name__ == "__main__":
 
     img_p = Path(args.in_p)
     out_p = Path(args.out_p)
-    out_p.mkdir(parents=True, exist_ok=True)
+    assert img_p.exists(), "Provided input path does not exist"
+    assert out_p.exists(), "Provided output path does not exist"
     main(img_p, out_p, scale_pct=args.scale_pct, z_dist=args.z_dist)
