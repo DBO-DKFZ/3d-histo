@@ -127,7 +127,24 @@ def main(fol_p: Path, out_p: Path):
 
 
 if __name__ == "__main__":
-    fol_p = Path("/mnt/ssd/Data/3DTumorModell/qupath_output/slices_png_2")
-    out_p = Path("/mnt/ssd/Data/3DTumorModell/fiji_input/half2_png")
+    from argparse import ArgumentParser
+
+    parser = ArgumentParser()
+    parser.add_argument(
+        "--in_p",
+        type=str,
+        help="Path to exported .png files from Qupath",
+        default="/mnt/ssd/Data/3DTumorModell/qupath_output/cropped_slices",
+    )
+    parser.add_argument(
+        "--out_p",
+        type=str,
+        help="Path where to store processed images for further spatial alignment",
+        default="/mnt/ssd/Data/3DTumorModell/fiji_input/half2_png",
+    )
+    args = parser.parse_args()
+
+    fol_p = Path(args.in_p)
+    out_p = Path(args.out_p)
     out_p.mkdir(parents=True, exist_ok=True)
     main(fol_p, out_p)

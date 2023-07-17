@@ -95,7 +95,36 @@ def main(img_p: Path, out_p: Path, scale_pct: int = 10, z_dist: int = 1):
 
 
 if __name__ == "__main__":
-    img_p = Path("/mnt/ssd/Data/3DTumorModell/fiji_output/convert_png")
-    out_p = Path("/mnt/ssd/Data/3DTumorModell/fiji_output/nifti")
+    from argparse import ArgumentParser
+
+    parser = ArgumentParser()
+    parser.add_argument(
+        "--in_p",
+        type=str,
+        help="Path to image sequence",
+        default="/mnt/ssd/Data/3DTumorModell/fiji_output/convert_png",
+    )
+    parser.add_argument(
+        "--out_p",
+        type=str,
+        help="Path where to store 3D model file",
+        default="/mnt/ssd/Data/3DTumorModell/fiji_output/nifti",
+    )
+    parser.add_argument(
+        "--scale_pct",
+        type=int,
+        help="Scaling of original image size in percent",
+        default=10,
+    )
+    parser.add_argument(
+        "--z_dist",
+        type=int,
+        help="Distance between each stacked image in pixels",
+        default=1,
+    )
+    args = parser.parse_args()
+
+    img_p = Path(args.in_p)
+    out_p = Path(args.out_p)
     out_p.mkdir(parents=True, exist_ok=True)
-    main(img_p, out_p, scale_pct=10, z_dist=1)
+    main(img_p, out_p, scale_pct=args.scale_pct, z_dist=args.z_dist)

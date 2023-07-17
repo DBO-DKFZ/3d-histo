@@ -34,7 +34,24 @@ def convert(tiff_p: Path, out_p: Path):
 
 
 if __name__ == "__main__":
-    tiff_p = Path("/mnt/ssd/Data/3DTumorModell/fiji_output/trakem_tiff")
-    out_p = Path("/mnt/ssd/Data/3DTumorModell/fiji_output/convert_png")
+    from argparse import ArgumentParser
+
+    parser = ArgumentParser()
+    parser.add_argument(
+        "--in_p",
+        type=str,
+        help="Path to exported .tif files from Fiji",
+        default="/mnt/ssd/Data/3DTumorModell/fiji_output/trakem_tiff",
+    )
+    parser.add_argument(
+        "--out_p",
+        type=str,
+        help="Path where to store coverted .png files",
+        default="/mnt/ssd/Data/3DTumorModell/fiji_output/convert_png",
+    )
+    args = parser.parse_args()
+
+    tiff_p = Path(args.in_p)
+    out_p = Path(args.out_p)
     out_p.mkdir(parents=True, exist_ok=True)
     convert(tiff_p, out_p)
