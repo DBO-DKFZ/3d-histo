@@ -9,3 +9,4 @@ dependencies:
     - matplotlib==3.7.1
     - tqdm==4.65.0
     - nibabel==5.1.0
+    - open3d==0.17.0

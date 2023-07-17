@@ -50,15 +50,24 @@ def build_ply(xyz: np.ndarray, colors: np.ndarray, out_p: Path):
     o3d.io.write_point_cloud(str(out_p / "3d_model.ply"), pcd)
 
 
-def main(img_p: Path, out_p: Path):
+def main(img_p: Path, out_p: Path, scale_pct: int = 10, z_dist: int = 1):
+    """
+    Turn image sequence into single geometric file
+
+    params:
+    img_p: Path to image sequence
+    out_p: Path where output file is stored
+    scale_pct: Scaling of original image size in percent
+    z_dist: Distance between each stacked image in pixels
+    """
+
     files = sorted(list(img_p.iterdir()))
     pil_img = Image.open(files[0])
     img = np.array(pil_img)
-    scale_percent = 10  # percent of original size
-    width = int(img.shape[1] * scale_percent / 100)
-    height = int(img.shape[0] * scale_percent / 100)
+    width = int(img.shape[1] * scale_pct / 100)
+    height = int(img.shape[0] * scale_pct / 100)
     dim = (width, height)
-    stack = np.zeros((len(files) * 3, height, width, 3), dtype=np.uint8)  # Allocate stack array
+    stack = np.zeros((len(files) * z_dist, height, width, 3), dtype=np.uint8)  # Allocate stack array
     z_val = 0
     all_xyz = []
     all_colors = []
@@ -73,7 +82,7 @@ def main(img_p: Path, out_p: Path):
         # all_xyz.append(xyz)
         # all_colors.append(colors)
         stack[z_val] = resized
-        z_val += 3
+        z_val += z_dist
 
     stack = stack.transpose(2, 0, 1, 3)  # Transpose coordinate system to (width, depth, height, channels)
     stack = np.flip(stack, axis=2)  # Flip height Axis
@@ -89,4 +98,4 @@ if __name__ == "__main__":
     img_p = Path("/mnt/ssd/Data/3DTumorModell/fiji_output/convert_png")
     out_p = Path("/mnt/ssd/Data/3DTumorModell/fiji_output/nifti")
     out_p.mkdir(parents=True, exist_ok=True)
-    main(img_p, out_p)
+    main(img_p, out_p, scale_pct=10, z_dist=1)
